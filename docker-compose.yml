@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/images/app/Dockerfile
+    ports:
+      - "9990:3000"
+    volumes:
+      - ./app:/project/app:cached
+    command: npm start
+    tty: true
+    env_file: .env.local
+
