@@ -15,7 +15,7 @@ const DateItemStyled = styled.div`
     &__container {
       height: 100%;
       width: 100%;
-      transition: all 0.3s;
+      transition: background-color 0.3s, color 0.3s;
 
       &.current {
       }
@@ -64,7 +64,6 @@ const DateItem = (props: { dayContents: any }) => {
             "date-item__container",
             dayContents.class,
             dayContents.isCurrent ? "current" : "other",
-            // currentRcDate.month() === dayContents.rcDate.month() ? "current" : "other",
           ].join(" ")
         }
         onClick={() => currentEvent(dayContents)}

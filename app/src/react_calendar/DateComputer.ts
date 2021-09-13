@@ -9,6 +9,25 @@ type CalendarBase = {
 }
 
 class DateComputer {
+  static getDaysCurrentWeek(date: RcDateInitType): DayContents[] {
+    let rcDate: RcDate = (new RcDate(date)).firstDayOfThisWeek();
+    let days: DayContents[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      days.push({
+        events: [],
+        rcDate: rcDate,
+        class: rcDate.dayColor(),
+        isCurrent: true,
+      });
+
+      rcDate = rcDate.clone().nextDay();
+    }
+
+    return days;
+  }
+
+
   static calcDaysCurrentMonth(date: RcDateInitType): number {
     const rcDate = new RcDate(date);
     const start: RcDate = rcDate.clone().firstDayOfThisMonth();
@@ -58,51 +77,30 @@ class DateComputer {
     ];
   }
 
-  static buildCalendarBase(data: RcDateInitType): CalendarBase {
-    const rcDate: RcDate       = new RcDate(data);
-    const next: RcDate         = rcDate.clone().nextMonth();
-    const nextNext: RcDate     = rcDate.clone().nextMonth().nextMonth();
-    const before: RcDate       = rcDate.clone().previousMonth();
-    const beforeBefore: RcDate = rcDate.clone().previousMonth().previousMonth();
+  static buildCalendar(rcDate: RcDate): DayContents[] {
+    const currentMonth: DayContents[] = DateComputer.getDays(rcDate.toDate());
+    const nextMonth: DayContents[]    = DateComputer.getDays(rcDate.clone().nextMonth().toDate());
+    const beforeMonth: DayContents[]  = DateComputer.getDays(rcDate.clone().previousMonth().toDate());
 
-    const currentMonth: DayContents[]      = DateComputer.getDays(rcDate.toDate());
-    const nextMonth: DayContents[]         = DateComputer.getDays(next.toDate());
-    const beforeMonth: DayContents[]       = DateComputer.getDays(before.toDate());
-    const nextNextMonth: DayContents[]     = DateComputer.getDays(nextNext.toDate());
-    const beforeBeforeMonth: DayContents[] = DateComputer.getDays(beforeBefore.toDate());
-
-    const paddedCurrentMonth = DateComputer.paddingDaysStartAndEnd(
+    return DateComputer.paddingDaysStartAndEnd(
       currentMonth,
       nextMonth,
       beforeMonth,
-    ).map(item => {
+    ).map((item) => {
       item.isCurrent = rcDate.month() === item.rcDate.month();
       return item;
-    });
+    }).slice(0, 35); // 31日目がある場合にはみ出すのでトリミングする
+  }
 
-    const paddedNextMonth = DateComputer.paddingDaysStartAndEnd(
-      nextMonth,
-      nextNextMonth,
-      currentMonth,
-    ).map(item => {
-      item.isCurrent = next.month() === item.rcDate.month();
-      return item;
-    });
+  static buildCalendarBase(date: RcDateInitType): CalendarBase {
+    const paddedCurrentMonth = DateComputer.buildCalendar(new RcDate(date));
+    const paddedNextMonth = DateComputer.buildCalendar((new RcDate(date)).nextMonth());
+    const paddedBeforeMonth = DateComputer.buildCalendar((new RcDate(date)).previousMonth());
 
-    const paddedBeforeMonth = DateComputer.paddingDaysStartAndEnd(
-      beforeMonth,
-      currentMonth,
-      nextNextMonth,
-    ).map(item => {
-      item.isCurrent = before.month() === item.rcDate.month();
-      return item;
-    });
-
-    // 31日目がある場合にはみ出すのでトリミングする
     return {
-      currentMonth: paddedCurrentMonth.slice(0, 35),
-      nextMonth: paddedNextMonth.slice(0, 35),
-      beforeMonth: paddedBeforeMonth.slice(0, 35),
+      currentMonth: paddedCurrentMonth,
+      nextMonth: paddedNextMonth,
+      beforeMonth: paddedBeforeMonth,
     }
   }
 }

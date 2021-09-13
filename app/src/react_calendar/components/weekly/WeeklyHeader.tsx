@@ -1,15 +1,15 @@
 import RcDate from '../../RcDate';
 import styled from 'styled-components';
 import { rcConf } from '../../calendarConfig';
-import { GetCurrentRcDateState } from '../CurrentRcDateContext';
 import { GetCalendarEventState } from '../CalendarEventContext';
+import { GetCurrentRcDateState } from '../CurrentRcDateContext';
 
-const MonthlyHeaderStyled = styled.div`
+const WeeklyHeaderStyled = styled.div`
   .monthly-header {
     border: 1px solid #000;
     border-bottom: none;
     margin: 0 10px;
-    width: calc(${rcConf.daysWidth} - 2px);
+    width: calc(50px + 1px + ${rcConf.daysWidth} - 2px);
 
     &__date {
       color: #fff;
@@ -57,10 +57,28 @@ const MonthlyHeaderStyled = styled.div`
       }
     }
 
+    &__minutes {
+      height: 15px;
+      line-height: 12px;
+      white-space: nowrap;
+      width: calc(${rcConf.dateWidth});
+      display: inline-block;
+
+      &--minute {
+        box-sizing: border-box;
+        display: inline-block;
+        font-size: ${rcConf.dateFontSize};
+        padding-left: 3px;
+        width: calc(${rcConf.dateWidth} + 1px);
+      }
+    }
+ 
     &__days {
       height: 15px;
       line-height: 12px;
       white-space: nowrap;
+      width: calc(${rcConf.daysWidth} - 2px);
+      display: inline-block;
 
       &--day {
         box-sizing: border-box;
@@ -73,9 +91,12 @@ const MonthlyHeaderStyled = styled.div`
   }
 `;
 
-const MonthlyHeader = () => {
+const WeeklyHeader = () => {
   const { currentRcDate, setCurrentRcDate } = GetCurrentRcDateState();
   const { setClickedBefore, setClickedNext, setClickedCurrent } = GetCalendarEventState();
+
+  console.log(currentRcDate.toString());
+  console.log(currentRcDate.dayText());
 
   const current = () => {
     setClickedCurrent(true);
@@ -106,7 +127,7 @@ const MonthlyHeader = () => {
   }
 
   return (
-    <MonthlyHeaderStyled>
+    <WeeklyHeaderStyled>
       <div className="monthly-header">
         <div className="monthly-header__date">
           <span className="monthly-header__date--year">
@@ -124,20 +145,29 @@ const MonthlyHeader = () => {
             onClick={() => next()}
           >▶︎</span>
         </div>
-        <div className="monthly-header__days">
-        {
-          rcConf.daysText.map((day) => {
-            return (
-              <div className="monthly-header__days--day">
-                {day}
-              </div>
-            );
-          })
-        }
+        <div className="monthly-header__minutes">
+        </div>
+
+        <div className="monthly-header__day-wrapper">
+          <div className="monthly-header__dates">
+          {
+          }
+          </div>
+          <div className="monthly-header__days">
+          {
+            rcConf.daysText.map((day) => {
+              return (
+                <div className="monthly-header__days--day">
+                  {day}
+                </div>
+              );
+            })
+          }
+          </div>
         </div>
       </div>
-    </MonthlyHeaderStyled>
+    </WeeklyHeaderStyled>
   );
 };
 
-export default MonthlyHeader;
+export default WeeklyHeader;

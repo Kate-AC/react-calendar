@@ -1,6 +1,5 @@
 import DateComputer from '../../DateComputer';
-import MonthPanel from './MonthPanel';
-import DateItem from './DateItem';
+import WeekPanel from './WeekPanel';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { GetCurrentRcDateState } from '../CurrentRcDateContext';
@@ -8,11 +7,12 @@ import { GetCalendarEventState } from '../CalendarEventContext';
 import { rcConf } from '../../calendarConfig';
 
 // (幅 + 線1px) * 7 + 1px
-const MonthPanelListStyled = styled.div`
-  .month-panel-list {
+const WeekPanelListStyled = styled.div`
+  .week-panel-list {
     width: calc(${rcConf.daysWidth} + 20px);
     height: calc(${rcConf.daysHeight});
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
 
     &__container {
       top: 0;
@@ -39,7 +39,7 @@ const MonthPanelListStyled = styled.div`
     }
   }
 
-  .month {
+  .week {
     &-current {
       animation-name: month-current;
       animation-duration: 0.3s;
@@ -62,7 +62,7 @@ const MonthPanelListStyled = styled.div`
     }
   }
 
-  @keyframes month-current {
+  @keyframes week-current {
     0% {
       opacity: 1;
     }
@@ -74,7 +74,7 @@ const MonthPanelListStyled = styled.div`
     }
   }
 
-  @keyframes month-before {
+  @keyframes week-before {
     0% {
       left: -50px;
       opacity: 0;
@@ -93,7 +93,7 @@ const MonthPanelListStyled = styled.div`
     }
   }
 
-  @keyframes month-next {
+  @keyframes week-next {
     0% {
       left: 50px;
       opacity: 0;
@@ -109,16 +109,38 @@ const MonthPanelListStyled = styled.div`
     100% {
       opacity: 1;
       left: 0;
+    }
+  }
+
+  .one-day-panel {
+    .hour-item {
+      border: solid 1px #000;
+
+      .minute-item:not(:last-child) {
+        border-bottom: 1px dotted #ddd;
+      }
+
+      &:not(:last-child) {
+        border-bottom: none;
+      }
+    }
+
+    &:not(:last-child) {
+      .hour-item {
+        border-right: none;
+      }
     }
   }
 `;
 
-const MonthPanelList = () => {
+const WeekPanelList = () => {
   const { currentRcDate } = GetCurrentRcDateState();
   const { clickedBefore, clickedNext, clickedCurrent } = GetCalendarEventState();
   const [calendarBase, setCalendarBase] = useState(
     DateComputer.buildCalendarBase(currentRcDate.toDate())
   );
+
+  console.log(DateComputer.getDaysCurrentWeek(currentRcDate.toDate()));
 
   useEffect(() => {
     setCalendarBase(
@@ -127,33 +149,14 @@ const MonthPanelList = () => {
   }, [currentRcDate]);
 
   return (
-    <MonthPanelListStyled>
-      <div className="month-panel-list">
-        <div className="month-panel-list__container">
-          <div className={[
-            "month-panel-list__container--before",
-            clickedBefore ? 'month-before' : ''
-          ].join(" ")}>
-            <MonthPanel days={calendarBase.beforeMonth} />
-          </div>
-
-          <div className={[
-            "month-panel-list__container--current",
-            clickedCurrent ? 'month-current' : ''
-          ].join(" ")}>
-            <MonthPanel days={calendarBase.currentMonth} />
-          </div>
-
-          <div className={[
-            "month-panel-list__container--next",
-            clickedNext ? 'month-next' : ''
-          ].join(" ")}>
-            <MonthPanel days={calendarBase.nextMonth} />
-          </div>
+    <WeekPanelListStyled>
+      <div className="week-panel-list">
+        <div className="week-panel-list__container">
+          <WeekPanel />
         </div>
       </div>
-    </MonthPanelListStyled>
+    </WeekPanelListStyled>
   );
 };
 
-export default MonthPanelList;
+export default WeekPanelList;

@@ -28,7 +28,7 @@ class RcDate {
     }
 
     if (value instanceof Date) {
-      this._date = value;
+      this._date = new Date(value);
     }
   }
 
@@ -50,6 +50,14 @@ class RcDate {
     ].join(':');
 
     return date + ' ' + time;
+  }
+
+  firstDayOfThisWeek(): RcDate {
+    for (let i = this.day(); i > 0; i--) {
+      this.previousDay();
+    }
+
+    return this;
   }
 
   lastDayOfThisMonth(): RcDate {
